@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648904299877",
+    "project_id": "traveled-places-locations",
+    "storage_bucket": "traveled-places-locations.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648904299877:android:7817785f2c7dcf02d1bd8c",
+        "android_client_info": {
+          "package_name": "com.example.lesson73"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9n7mx2Iw9d5xgA74qK92ECcUUQiNDG4g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
