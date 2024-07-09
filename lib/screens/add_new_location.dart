@@ -1,11 +1,15 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lesson73/controller/travels_controller.dart';
+import 'package:lesson73/model/travel.dart';
 import 'package:lesson73/services/location_service.dart';
 
 class NewLocationScreen extends StatefulWidget {
-  const NewLocationScreen({super.key});
+  final Travel? travel;
+
+  const NewLocationScreen({super.key, this.travel});
 
   @override
   State<NewLocationScreen> createState() => _NewLocationScreenState();
@@ -18,10 +22,16 @@ class _NewLocationScreenState extends State<NewLocationScreen> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   String? cityName;
+
   @override
   void initState() {
     super.initState();
     _fetchCurrentLocation();
+    if (widget.travel != null) {
+      titleController.text = widget.travel!.title;
+      descriptionController.text = widget.travel!.description;
+      cityName = widget.travel!.location;
+    }
   }
 
   Future<void> _fetchCurrentLocation() async {
@@ -36,16 +46,28 @@ class _NewLocationScreenState extends State<NewLocationScreen> {
     }
   }
 
-  final myLocation = LocationService.currentLocation;
   void _validateAndSubmit() async {
     if (_formKey.currentState!.validate()) {
-      await _travelsController.addTravels(
-        titleController.text,
-        descriptionController.text,
-        _image!,
-        cityName ?? "",
-      );
-    } else {}
+      if (widget.travel != null) {
+        // Update existing travel
+        await _travelsController.updateTravel(
+          widget.travel!.id,
+          titleController.text,
+          descriptionController.text,
+          _image,
+          cityName ?? "",
+        );
+      } else {
+        // Add new travel
+        await _travelsController.addTravels(
+          titleController.text,
+          descriptionController.text,
+          _image!,
+          cityName ?? "",
+        );
+      }
+      Navigator.pop(context);
+    }
   }
 
   Future<void> _pickImage() async {
@@ -119,15 +141,22 @@ class _NewLocationScreenState extends State<NewLocationScreen> {
                     width: double.infinity,
                     height: 200,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.grey.shade200,
-                        image: _image != null
-                            ? DecorationImage(
-                                image: FileImage(_image!),
-                                fit: BoxFit.cover,
-                              )
-                            : null),
-                    child: _image == null
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey.shade200,
+                      image: _image != null
+                          ? DecorationImage(
+                              image: FileImage(_image!),
+                              fit: BoxFit.cover,
+                            )
+                          : widget.travel != null &&
+                                  widget.travel!.imageUrl.isNotEmpty
+                              ? DecorationImage(
+                                  image: NetworkImage(widget.travel!.imageUrl),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                    ),
+                    child: _image == null && widget.travel == null
                         ? const Icon(
                             Icons.add_a_photo_outlined,
                             size: 50,
@@ -189,12 +218,13 @@ class _NewLocationScreenState extends State<NewLocationScreen> {
                         ),
                       ),
                       onPressed: _validateAndSubmit,
-                      child: const Text(
-                        "Save",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24),
+                      child: Text(
+                        widget.travel != null ? "Update" : "Save",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
                       ),
                     ),
                   ),

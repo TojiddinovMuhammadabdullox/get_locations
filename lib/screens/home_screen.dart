@@ -29,8 +29,21 @@ class _HomeScreenState extends State<HomeScreen> {
       double lat = LocationService.currentLocation!.latitude!;
       double lng = LocationService.currentLocation!.longitude!;
       cityName = await LocationService.getCityFromCoordinates(lat, lng);
-      setState(() {}); // Update UI with city name
+      setState(() {});
     }
+  }
+
+  Future<void> _deleteTravel(String id) async {
+    await _travelsController.deleteTravel(id);
+  }
+
+  Future<void> _editTravel(Travel travel) async {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (ctx) => NewLocationScreen(travel: travel),
+      ),
+    );
   }
 
   @override
@@ -118,6 +131,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Colors.blue,
+                              ),
+                              onPressed: () => _editTravel(travel),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red ,
+                              ),
+                              onPressed: () => _deleteTravel(travel.id),
+                            ),
+                          ],
                         ),
                       ],
                     ),
